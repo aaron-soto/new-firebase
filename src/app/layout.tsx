@@ -1,6 +1,11 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
+
+import Chat from "@/components/Chat";
+// import Chat from "@/components/chat";
+import { Inter } from "next/font/google";
+import type { Metadata } from "next";
+import { Toaster } from "@/components/ui/toaster";
+import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +21,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      />
+      <body className={cn(inter.className, "dark relative")}>
+        {children}
+        <Chat />
+        <Toaster />
+      </body>
     </html>
   );
 }
