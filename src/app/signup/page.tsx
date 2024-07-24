@@ -9,29 +9,26 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { FormEvent, useState } from "react";
-import { auth, db } from "@/lib/firebase/clientApp"; // Import db here
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore"; // Import setDoc and doc
+import { auth, db } from "@/lib/firebase/clientApp";
+import { doc, setDoc } from "firebase/firestore";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
-import SimpleIcon from "@/components/SimpleIcon";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const formSchema = z.object({
   email: z.string().email(),
+  firstName: z.string().min(2),
+  lastName: z.string().min(2),
   password: z.string().min(6),
   confirmPassword: z.string().min(6),
   terms: z.boolean().refine((val) => val === true, {
@@ -47,6 +44,8 @@ const Page = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
+      firstName: "",
+      lastName: "",
       password: "",
       confirmPassword: "",
       terms: false,
@@ -55,7 +54,8 @@ const Page = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
-    const { email, password, confirmPassword, terms } = values;
+    const { email, firstName, lastName, password, confirmPassword, terms } =
+      values;
 
     if (password !== confirmPassword) {
       form.setError("confirmPassword", {
@@ -82,11 +82,12 @@ const Page = () => {
       const user = userCredential.user;
       console.log(user);
 
-      // Add user to Firestore with a default role
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         email: user.email,
-        role: "user", // Default role
+        firstName: firstName,
+        lastName: lastName,
+        role: "user",
         metadata: {
           creationTime: user.metadata.creationTime,
           lastSignInTime: user.metadata.lastSignInTime,
@@ -99,11 +100,9 @@ const Page = () => {
         description: "Your account has been successfully created",
       });
 
-      router.push("/signin");
+      router.push("/dashboard");
     } catch (error: any) {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.error("Error creating user:", errorCode, errorMessage);
+      const errorMessage = error.message || "An unexpected error occurred";
 
       toast({
         title: "Error",
@@ -115,30 +114,12 @@ const Page = () => {
   };
 
   return (
-    <div className="container min-h-screen flex items-center">
+    <div className="container flex items-center min-h-screen">
       <div className="w-[400px] mx-auto">
         <h1 className="text-2xl font-bold text-center">Create an account</h1>
-        <p className="text-center text-gray-500 mb-6">
+        <p className="mb-6 text-center text-gray-500">
           Sign up to start using our services
         </p>
-
-        <div className="flex my-4 gap-2">
-          <Button variant="outline" className="w-full">
-            <SimpleIcon name="apple" size={19} />
-          </Button>
-          <Button variant="outline" className="w-full">
-            <SimpleIcon name="google" color="#fcba03" size={19} />
-          </Button>
-          <Button variant="outline" className="w-full">
-            <SimpleIcon name="facebook" color="#3b5998" size={19} />
-          </Button>
-        </div>
-
-        <div className="flex items-center my-8">
-          <div className="h-px bg-gray-100 flex-1"></div>
-          <p className="mx-4 text-gray-300 text-xs">OR</p>
-          <div className="h-px bg-gray-100 flex-1"></div>
-        </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -154,6 +135,32 @@ const Page = () => {
                 </FormItem>
               )}
             />
+            <div className="flex gap-2">
+              <FormField
+                control={form.control}
+                name="firstName"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormControl>
+                      <Input placeholder="First name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormControl>
+                      <Input placeholder="Last name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
               name="password"
@@ -212,7 +219,7 @@ const Page = () => {
             />
             {loading ? (
               <Button className="w-full" disabled>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               </Button>
             ) : (
               <Button
@@ -223,9 +230,9 @@ const Page = () => {
                 Sign Up
               </Button>
             )}
-            <p className="text-center text-sm">
+            <p className="text-sm text-center">
               Already have an account?{" "}
-              <Link href="/signin" className="underline font-semibold">
+              <Link href="/signin" className="font-semibold underline">
                 Sign In
               </Link>
             </p>

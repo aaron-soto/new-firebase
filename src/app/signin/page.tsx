@@ -83,6 +83,7 @@ const SignInComponent = () => {
       })
       .then((userCredential) => {
         const user = userCredential.user;
+        console.log("Signed in as:", user);
         setUser(user);
         router.push("/dashboard");
       })
