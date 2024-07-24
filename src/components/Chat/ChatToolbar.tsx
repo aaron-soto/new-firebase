@@ -7,8 +7,10 @@ import { ChevronLeft, Minus, Settings, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/lib/hooks/useAuth";
 
 const ChatToolbar = () => {
+  const { user } = useAuthStore();
   const { toggleIsChatWindowOpen, currentScreen, setCurrentScreen } =
     useComponentStore();
 
@@ -38,6 +40,15 @@ const ChatToolbar = () => {
         <span className="text-orange-500">Support</span>
       </h2>
       <div className="flex gap-1">
+        {user?.role === "admin" && (
+          <Button
+            variant="ghost"
+            className="relative aspect-square text-neutral-500 hover:text-orange-500"
+            onClick={() => setCurrentScreen(CHAT_SCREEN.SETTINGS)}
+          >
+            <Settings size={24} className="absolute" />
+          </Button>
+        )}
         <Button
           variant="ghost"
           className="relative aspect-square text-neutral-500 hover:text-orange-500"

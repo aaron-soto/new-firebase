@@ -20,7 +20,7 @@ const ChatView = ({ chatId }: { chatId: string | null }) => {
   }
 
   return (
-    <ScrollArea className="h-full p-4">
+    <ScrollArea className="h-full border-x p-4">
       {messages.map((message) => (
         <div
           key={message.id}
@@ -29,8 +29,8 @@ const ChatView = ({ chatId }: { chatId: string | null }) => {
             "mr-auto rounded-bl-none": message.userId !== user?.uid,
           })}
         >
-          <p className="text-sm text-neutral-200">You</p>
-          <p className="text-base text-neutral-400">{message.message}</p>
+          <p className="text-sm font-bold text-neutral-200">You</p>
+          <p className="text-sm text-neutral-400">{message.message}</p>
         </div>
       ))}
     </ScrollArea>

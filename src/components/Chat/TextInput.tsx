@@ -64,8 +64,7 @@ const TextInput = () => {
       message,
     };
 
-    await addMessage(newMessage as any);
-
+    addMessage(newMessage as any);
     setCurrentScreen(CHAT_SCREEN.CHAT_VIEW);
 
     // Reset form

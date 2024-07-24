@@ -26,6 +26,7 @@ export const useAuthListener = () => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser as AZUser);
+        console.log(firebaseUser as AZUser);
       } else {
         setUser(null);
       }

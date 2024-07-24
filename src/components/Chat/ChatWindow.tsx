@@ -1,9 +1,8 @@
+import React, { useEffect, useState } from "react";
 import {
   CHAT_SCREEN,
   useComponentStore,
 } from "@/components/Chat/stores/componentStore";
-import React, { useEffect, useState } from "react";
-
 import ChatScreen from "@/components/Chat/ChatScreen";
 import ChatToolbar from "@/components/Chat/ChatToolbar";
 import TextInput from "@/components/Chat/TextInput";
@@ -16,7 +15,7 @@ const ChatWindow = () => {
 
   useEffect(() => {
     const checkActiveChat = async () => {
-      restoreActiveChat();
+      await restoreActiveChat();
       if (isInitialLoad && activeChat) {
         setCurrentScreen(CHAT_SCREEN.CHAT_VIEW);
       }
@@ -31,8 +30,8 @@ const ChatWindow = () => {
       <div className="flex-1">
         <ChatScreen />
       </div>
-      {currentScreen === CHAT_SCREEN.CHAT_VIEW ||
-        (currentScreen === CHAT_SCREEN.NEW_CHAT && <TextInput />)}
+      {(currentScreen === CHAT_SCREEN.CHAT_VIEW ||
+        currentScreen === CHAT_SCREEN.NEW_CHAT) && <TextInput />}
     </div>
   );
 };
